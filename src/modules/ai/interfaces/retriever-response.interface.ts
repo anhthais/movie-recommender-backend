@@ -1,6 +1,6 @@
 export interface RetrieverResponse {
-  status: number,
+  status: number;
   data: {
-    result: any,
-  }
+    result: any;
+  };
 }

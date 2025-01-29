@@ -4,10 +4,9 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserModule } from './modules/user/user.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { DevtoolsModule } from '@nestjs/devtools-integration';
-import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
+import { APP_INTERCEPTOR } from '@nestjs/core';
 import { ResponseTransformInterceptor } from './shared/interceptors/response-transform.interceptor';
 import { JwtModule } from '@nestjs/jwt';
-import { JwtAuthGuard } from './shared/guards/jwt.guard';
 import { HttpModule } from '@nestjs/axios';
 import { HttpConfigService } from './config/http.config';
 import { HttpClientModule } from './shared/http/http-client/http-client-module';
@@ -25,7 +24,7 @@ import { MoviesPopularModule } from './modules/movies-popular/movies-popular.mod
 import { MoviesTrendingModule } from './modules/movies-trending/movies-trending.module';
 
 @Module({
-  imports: [ 
+  imports: [
     DevtoolsModule.register({
       http: process.env.NODE_ENV !== 'production',
     }),
@@ -43,7 +42,7 @@ import { MoviesTrendingModule } from './modules/movies-trending/movies-trending.
         return {
           secret: process.env.JWT_SECRET,
           signOptions: {
-            expiresIn: 8 * 60 * 10000000,
+            expiresIn: '5m',
           },
         };
       },

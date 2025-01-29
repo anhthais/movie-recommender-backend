@@ -1,40 +1,49 @@
-import User from "@/modules/user/entities/user.entity";
-import { Column, CreateDateColumn, Entity, JoinColumn, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
-import PlaylistItem from "./playlist-item.entity";
+import User from '@/modules/user/entities/user.entity';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
+import PlaylistItem from './playlist-item.entity';
 
 export enum PlayListAccessibility {
-    'PUBLIC' = 'public',
-    'PRIVATE' = 'private',
-};
+  'PUBLIC' = 'public',
+  'PRIVATE' = 'private',
+}
 
-@Entity({ name: "playlist" })
+@Entity({ name: 'playlist' })
 export default class Playlist {
-    @PrimaryGeneratedColumn()
-    id: number;
+  @PrimaryGeneratedColumn()
+  id: number;
 
-    @JoinColumn({ name: 'user_id' })
-    @ManyToOne(type => User, { onDelete: 'CASCADE' })
-    user: User;
+  @JoinColumn({ name: 'user_id' })
+  @ManyToOne(() => User, { onDelete: 'CASCADE' })
+  user: User;
 
-    @Column()
-    name: string;
+  @Column()
+  name: string;
 
-    @Column()
-    description: string;
+  @Column()
+  description: string;
 
-    @Column({
-        type: 'enum',
-        enum: PlayListAccessibility,
-        default: PlayListAccessibility.PUBLIC
-    })
-    accessibility: PlayListAccessibility
+  @Column({
+    type: 'enum',
+    enum: PlayListAccessibility,
+    default: PlayListAccessibility.PUBLIC,
+  })
+  accessibility: PlayListAccessibility;
 
-    @OneToMany(type => PlaylistItem, item => item.playlist)
-    items: PlaylistItem[];
+  @OneToMany(() => PlaylistItem, (item) => item.playlist)
+  items: PlaylistItem[];
 
-    @CreateDateColumn({type: 'timestamp', name: 'created_at'})
-    createdAt: Date;
-    
-    @UpdateDateColumn({type: 'timestamp', name: 'updated_at'})
-    updatedAt: Date;
-};
+  @CreateDateColumn({ type: 'timestamp', name: 'created_at' })
+  createdAt: Date;
+
+  @UpdateDateColumn({ type: 'timestamp', name: 'updated_at' })
+  updatedAt: Date;
+}

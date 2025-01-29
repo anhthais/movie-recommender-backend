@@ -1,16 +1,16 @@
-import { Exclude, Expose } from "class-transformer";
+import { Exclude, Expose } from 'class-transformer';
 
 @Exclude()
 export class UserMiniDto {
-    @Expose()
-    id: number;
+  @Expose()
+  id: number;
 
-    @Expose()
-    fullname: string;
+  @Expose()
+  fullname: string;
 
-    @Expose()
-    username: string;
+  @Expose()
+  username: string;
 
-    @Expose()
-    picture: string;
-};
+  @Expose()
+  picture: string;
+}

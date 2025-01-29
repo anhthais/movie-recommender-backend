@@ -1,12 +1,20 @@
-import User from "@/modules/user/entities/user.entity";
-import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import User from '@/modules/user/entities/user.entity';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 
 @Entity({ name: 'reviews' })
 export default class Review {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @JoinColumn({ name: 'user_id'})
+  @JoinColumn({ name: 'user_id' })
   @ManyToOne(() => User, (user) => user.id, { onDelete: 'CASCADE' })
   user: User;
 

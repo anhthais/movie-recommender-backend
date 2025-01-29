@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { IPeople, PeopleModel } from './schemas/people.schema';
+import { IPeople } from './schemas/people.schema';
 import { InjectRepository } from '@nestjs/typeorm';
 import Rating from '../movies/entities/rating.entity';
 import { Repository } from 'typeorm';
@@ -9,18 +9,18 @@ import { Repository } from 'typeorm';
 @Injectable()
 export class PeopleService {
   constructor(
-    @InjectModel("people") private readonly movieModel: Model<IPeople>,
-    @InjectRepository(Rating) private readonly ratingRepo: Repository<Rating>
+    @InjectModel('people') private readonly movieModel: Model<IPeople>,
+    @InjectRepository(Rating) private readonly ratingRepo: Repository<Rating>,
   ) {}
 
   findAll() {
-    return this.movieModel.find().exec(); 
+    return this.movieModel.find().exec();
   }
 
   async findOne(id: string) {
     const person = await this.movieModel.findOne({ tmdb_id: id }).exec();
     if (!person) {
-        throw new Error('Person not found');
+      throw new Error('Person not found');
     }
 
     // map rating in credits with our own rating
@@ -41,7 +41,7 @@ export class PeopleService {
       }
     }
 
-    console.log(person); 
+    console.log(person);
     return person;
   }
 }

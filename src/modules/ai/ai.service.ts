@@ -1,39 +1,44 @@
-import { LlmHttpConfigService } from "@/config/llm-http.config";
-import { HttpService } from "@nestjs/axios";
-import { Injectable, InternalServerErrorException } from "@nestjs/common";
-import { ConfigService } from "@nestjs/config";
-import { catchError, firstValueFrom } from "rxjs";
-import { AxiosError } from "axios";
-import { InjectModel } from "@nestjs/mongoose";
-import { IMovie } from "../movies/schemas/movie.schema";
-import { IGenre } from "../movies/schemas/genre.schema";
-import { Model } from "mongoose";
-import { NavigationResponse, NavigationRoute } from "./interfaces/navigation-response.interface";
-import { RetrieverResponse } from "./interfaces/retriever-response.interface";
-import { Repository } from "typeorm";
-import Rating from "../movies/entities/rating.entity";
-import { InjectRepository } from "@nestjs/typeorm";
+import { HttpService } from '@nestjs/axios';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { catchError, firstValueFrom } from 'rxjs';
+import { AxiosError } from 'axios';
+import { InjectModel } from '@nestjs/mongoose';
+import { IMovie } from '../movies/schemas/movie.schema';
+import { IGenre } from '../movies/schemas/genre.schema';
+import { Model } from 'mongoose';
+import {
+  NavigationResponse,
+  NavigationRoute,
+} from './interfaces/navigation-response.interface';
+import { RetrieverResponse } from './interfaces/retriever-response.interface';
+import { Repository } from 'typeorm';
+import Rating from '../movies/entities/rating.entity';
+import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class AiService {
   private readonly llmApiKey: string;
-  constructor(private readonly httpService: HttpService,
+  constructor(
+    private readonly httpService: HttpService,
     private readonly configService: ConfigService,
-    @InjectModel("movies") private movieModel: Model<IMovie>,
-    @InjectModel("genres") private genreModel: Model<IGenre>,
-    @InjectRepository(Rating) private readonly ratingRepo: Repository<Rating>
+    @InjectModel('movies') private movieModel: Model<IMovie>,
+    @InjectModel('genres') private genreModel: Model<IGenre>,
+    @InjectRepository(Rating) private readonly ratingRepo: Repository<Rating>,
   ) {
     this.llmApiKey = configService.get('LLM_API_KEY');
   }
 
   async navigate(query: string) {
-    const res = this
-      .httpService
-      .post<NavigationResponse>(`/navigate/?llm_api_key=${this.llmApiKey}&query=${query}`, {
-        headers: {
-          Accept: 'application/json'
-        }
-      })
+    const res = this.httpService
+      .post<NavigationResponse>(
+        `/navigate/?llm_api_key=${this.llmApiKey}&query=${query}`,
+        {
+          headers: {
+            Accept: 'application/json',
+          },
+        },
+      )
       .pipe(
         catchError((error: AxiosError) => {
           console.error(error);
@@ -43,9 +48,11 @@ export class AiService {
 
     const { data } = await firstValueFrom(res);
 
-    if(data.data.route === NavigationRoute.CAST_PAGE && data.data.params) {
-      const movies = await this.movieModel.find({ _id: { $in: data.data.params.movie_ids } });
-      
+    if (data.data.route === NavigationRoute.CAST_PAGE && data.data.params) {
+      const movies = await this.movieModel.find({
+        _id: { $in: data.data.params.movie_ids },
+      });
+
       if (movies.length === 0) {
         data.data.route = NavigationRoute.NONE;
         data.data.params = null;
@@ -53,14 +60,18 @@ export class AiService {
         data.data.params = movies.map((movie: IMovie) => {
           return {
             id: movie.tmdb_id,
-            name: movie.title || movie.original_title
-          }
+            name: movie.title || movie.original_title,
+          };
         });
       }
+    } else if (
+      data.data.route === NavigationRoute.MOVIE_PAGE &&
+      data.data.params
+    ) {
+      const movies = await this.movieModel.find({
+        _id: { $in: data.data.params.movie_ids },
+      });
 
-    } else if (data.data.route === NavigationRoute.MOVIE_PAGE && data.data.params) {
-      const movies = await this.movieModel.find({ _id: { $in: data.data.params.movie_ids } });
-      
       if (movies.length === 0) {
         data.data.route = NavigationRoute.NONE;
         data.data.params = null;
@@ -69,12 +80,16 @@ export class AiService {
           return {
             id: movie.tmdb_id,
             name: movie.title,
-          }
+          };
         });
       }
-
-    } else if (data.data.route === NavigationRoute.GENRE_PAGE && data.data.params) {
-      const genres = await this.genreModel.find({ _id: { $in: data.data.params.genre_ids } });
+    } else if (
+      data.data.route === NavigationRoute.GENRE_PAGE &&
+      data.data.params
+    ) {
+      const genres = await this.genreModel.find({
+        _id: { $in: data.data.params.genre_ids },
+      });
 
       if (genres.length === 0) {
         data.data.route = NavigationRoute.NONE;
@@ -84,7 +99,7 @@ export class AiService {
           return {
             id: genre.tmdb_id,
             name: genre.name,
-          }
+          };
         });
       }
     } else if (!data.data.params) {
@@ -94,7 +109,12 @@ export class AiService {
     return data.data;
   }
 
-  async retrieveMovies(collectionName: string, query: string, amount: number = 10, threshold: number = 0.25) {
+  async retrieveMovies(
+    collectionName: string,
+    query: string,
+    amount: number = 10,
+    threshold: number = 0.25,
+  ) {
     const params = {
       llm_api_key: this.llmApiKey,
       collection_name: collectionName,
@@ -102,22 +122,21 @@ export class AiService {
       amount,
       threshold,
     };
-  
+
     const res = this.httpService
-      .get<RetrieverResponse>('/retriever/', 
-        { 
-          params, 
-          headers: {
-            Accept: 'application/json'
-          }
-        })
+      .get<RetrieverResponse>('/retriever/', {
+        params,
+        headers: {
+          Accept: 'application/json',
+        },
+      })
       .pipe(
-      catchError((error: AxiosError) => {
-        console.error('Error retrieving movies:', error.message);
-        throw new InternalServerErrorException('Failed to retrieve movies');
-      }),
-    );
-    
+        catchError((error: AxiosError) => {
+          console.error('Error retrieving movies:', error.message);
+          throw new InternalServerErrorException('Failed to retrieve movies');
+        }),
+      );
+
     const { data } = await firstValueFrom(res);
 
     if (!data.data.result || data.data.result.length === 0) {

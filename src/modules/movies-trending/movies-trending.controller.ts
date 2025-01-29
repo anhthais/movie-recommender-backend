@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { MoviesTrendingService } from './movies-trending.service';
 import { HttpClient } from '@/shared/http/http-client/http-client';
 import { TmdbMovieDto } from '@/shared/tmdb/dtos/tmdb-movie.dto';

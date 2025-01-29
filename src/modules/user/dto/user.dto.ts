@@ -1,33 +1,33 @@
-import { Exclude, Expose } from "class-transformer";
+import { Exclude, Expose } from 'class-transformer';
 
 @Exclude()
 export class UserDto {
-    @Expose()
-    id: number;
+  @Expose()
+  id: number;
 
-    @Expose()
-    email: string;
+  @Expose()
+  email: string;
 
-    @Expose()
-    username: string;
+  @Expose()
+  username: string;
 
-    @Expose()
-    fullname: string;
+  @Expose()
+  fullname: string;
 
-    @Expose()
-    activated: boolean;
+  @Expose()
+  activated: boolean;
 
-    @Expose()
-    disabled: boolean;
+  @Expose()
+  disabled: boolean;
 
-    @Expose()
-    createdAt: Date;
+  @Expose()
+  createdAt: Date;
 
-    @Expose()
-    updatedAt: Date;
+  @Expose()
+  updatedAt: Date;
 
-    @Expose()
-    picture: string;
+  @Expose()
+  picture: string;
 
-    password: string;
+  password: string;
 }

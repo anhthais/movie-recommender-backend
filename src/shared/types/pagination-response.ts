@@ -1,6 +1,6 @@
-import { PaginationDto } from "../dtos/pagination.dto";
+import { PaginationDto } from '../dtos/pagination.dto';
 
 export default interface PaginationResponse {
-    data: any,
-    pagination: PaginationDto
+  data: any;
+  pagination: PaginationDto;
 }

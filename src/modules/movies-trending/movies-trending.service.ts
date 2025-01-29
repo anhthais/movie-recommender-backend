@@ -10,7 +10,7 @@ export class MoviesTrendingService {
   }
 
   findOne(id: number) {
-    return this.movies.find(movie => movie.id === id);
+    return this.movies.find((movie) => movie.id === id);
   }
 
   create(createMovieDto: TmdbMovieDto) {
@@ -19,7 +19,7 @@ export class MoviesTrendingService {
   }
 
   update(id: number, updateMovieDto: TmdbMovieDto) {
-    const movieIndex = this.movies.findIndex(movie => movie.id === id);
+    const movieIndex = this.movies.findIndex((movie) => movie.id === id);
     if (movieIndex > -1) {
       this.movies[movieIndex] = updateMovieDto;
       return updateMovieDto;
@@ -28,7 +28,7 @@ export class MoviesTrendingService {
   }
 
   remove(id: number) {
-    const movieIndex = this.movies.findIndex(movie => movie.id === id);
+    const movieIndex = this.movies.findIndex((movie) => movie.id === id);
     if (movieIndex > -1) {
       const removedMovie = this.movies.splice(movieIndex, 1);
       return removedMovie[0];

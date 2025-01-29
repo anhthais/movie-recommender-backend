@@ -1,64 +1,72 @@
-import { CanActivate, ExecutionContext, Injectable, Logger, UnauthorizedException } from "@nestjs/common";
-import { Reflector } from "@nestjs/core";
-import { JwtService } from "@nestjs/jwt";
-import { Request } from "express";
-import { UserService } from "src/modules/user/user.service";
+import {
+  CanActivate,
+  ExecutionContext,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
+import { Reflector } from '@nestjs/core';
+import { JwtService } from '@nestjs/jwt';
+import { Request } from 'express';
+import { UserService } from 'src/modules/user/user.service';
+import { IS_PUBLIC_KEY } from '../decorators/public.recorator';
 
 @Injectable()
 export class JwtAuthGuard implements CanActivate {
-    constructor(
-        private readonly jwtService: JwtService,
-        private readonly userService: UserService,
-        private readonly reflector: Reflector,
-    ) {}
+  constructor(
+    private readonly jwtService: JwtService,
+    private readonly userService: UserService,
+    private readonly reflector: Reflector,
+  ) {}
 
-    async canActivate(context: ExecutionContext): Promise<boolean> {
+  async canActivate(context: ExecutionContext): Promise<boolean> {
+    const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
+      context.getHandler(),
+      context.getClass(),
+    ]);
 
-        const isPublic = this.reflector.getAllAndOverride<boolean>('isPublic', [
-            context.getHandler(),
-            context.getClass()
-        ])
-
-        const ctx = context.switchToHttp();
-        const req = ctx.getRequest();
-        
-        const token = this.getToken(req);
-
-        if(!token && !isPublic) {
-            throw new UnauthorizedException("Invalid token");
-        } else if (!token && isPublic) {
-            return true;
-        }
-
-        try {
-            const payload = await this.jwtService.verifyAsync(token, {
-                secret: process.env.JWT_SECRET
-            });
-
-            const user = await this.userService.getUserById(payload.sub);
-
-            if(!user) {
-                throw new UnauthorizedException("Invalid token");
-            }
-
-            req.user = user;
-        } catch(err) {
-            throw new UnauthorizedException("Invalid token");
-        }
-
-        return true;
+    if (isPublic) {
+      return true;
     }
 
-    private getToken(request: Request): string {
-        const authHeader = request.headers.authorization;
-        if(!authHeader) {
-            return null;
-        }
+    const ctx = context.switchToHttp();
+    const req = ctx.getRequest();
+    const token = this.getToken(req);
 
-        if(authHeader.startsWith('Bearer ')) {
-            return authHeader.substring(7);
-        }
-
-        return null;
+    if (!token) {
+      throw new UnauthorizedException('Invalid token');
     }
+
+    try {
+      const payload = await this.jwtService.verifyAsync(token, {
+        secret: process.env.JWT_SECRET,
+      });
+
+      const user = await this.userService.getUserById(payload.sub);
+
+      if (!user) {
+        throw new UnauthorizedException('User not found');
+      }
+
+      req.user = user;
+    } catch {
+      throw new UnauthorizedException('Invalid token');
+    }
+
+    return true;
+  }
+
+  private getToken(request: Request): string {
+    const authHeader = request.headers.authorization;
+    if (!authHeader) {
+      return null;
+    }
+
+    const [type, token] = authHeader.split(' ');
+
+    if (type !== 'Bearer') {
+      return null;
+    }
+
+    return token;
+  }
 }

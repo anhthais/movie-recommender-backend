@@ -1,4 +1,4 @@
-import mongoose, { Schema, Document , Types, mongo} from 'mongoose';
+import mongoose, { Schema, Document } from 'mongoose';
 
 export interface IGenre extends Document {
   name: string;

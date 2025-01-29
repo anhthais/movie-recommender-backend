@@ -1,5 +1,5 @@
 export class PaginationDto {
-    totalPages: number;
-    totalRecords: number;
-    currentPage: number;
+  totalPages: number;
+  totalRecords: number;
+  currentPage: number;
 }

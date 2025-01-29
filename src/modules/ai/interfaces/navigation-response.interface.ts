@@ -7,11 +7,11 @@ export enum NavigationRoute {
 }
 
 export interface NavigationResponse {
-  status: number,
+  status: number;
   data: {
-    route: NavigationRoute,
+    route: NavigationRoute;
     params: any;
     metadata: any;
     is_success: boolean;
-  }
+  };
 }

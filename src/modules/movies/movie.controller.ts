@@ -1,4 +1,3 @@
-import { HttpService } from '@nestjs/axios';
 import {
   Body,
   Controller,
@@ -9,10 +8,8 @@ import {
   Param,
   Patch,
   Post,
-  Put,
   Query,
   Req,
-  Res,
 } from '@nestjs/common';
 import { Public } from 'src/shared/decorators/public.recorator';
 import { HttpClient } from 'src/shared/http/http-client/http-client';
@@ -201,15 +198,6 @@ export class MovieController {
     return this.movieService.deleteReview(reviewId, movieId, user.id);
   }
 
-  // Dark magic :))
-  @Public()
-  @Get('/get-with-objectids')
-  async getTmdbMovie(@Query('objectIds') objectIds: string) {
-    console.log(objectIds);
-    const idsArray = objectIds.split(',');
-    return this.movieService.getMoviesWithObjectIds(idsArray);
-  }
-
   // tmdb emulated endpoints
   @Public()
   @Get('/search')
@@ -276,55 +264,5 @@ export class MovieController {
   @Get('/detail/:movieId/casts')
   async getMovieCasts(@Param('movieId') movieId: number) {
     return this.movieService.getMovieCasts(movieId);
-  }
-
-  // MongoDB version
-  @Public()
-  @Get('/mongo/detail/:movieId')
-  async getMovieByIdFromMongo(@Param('movieId') movieId: number) {
-    return this.movieService.getMovieByIdFromMongo(movieId);
-  }
-
-  @Public()
-  @Get('/mongo/search')
-  async searchMovieFromMongo(
-    @Query('query') query: string,
-    @Query('page') page: number,
-  ) {
-    if (isNaN(page)) {
-      page = 1;
-    }
-    return this.movieService.searchMoviesFromMongo(query, page);
-  }
-
-  @Public()
-  @Get('/mongo/popular')
-  async getPopularMoviesFromMongo() {
-    return this.movieService.getPopularMoviesFromMongo();
-  }
-
-  @Public()
-  @Get('/mongo/trending/:mediaType/:duration')
-  async getTrendingMoviesFromMongo(
-    @Param('mediaType') mediaType: string,
-    @Param('duration') duration: string,
-  ) {
-    return this.movieService.getTrendingMoviesFromMongo(mediaType, duration);
-  }
-
-  @Public()
-  @Get('/mongo/now-playing')
-  async getNowPlayingMoviesFromMongo() {
-    return this.movieService.getNowPlayingMoviesFromMongo();
-  }
-
-  @Public()
-  @Get('/mongo/discover')
-  async discoverMoviesFromMongo(@Query() query: Record<string, string>) {
-    const queryString = Object.keys(query)
-      .map((key) => `${key}=${query[key]}`)
-      .join('&');
-
-    return this.movieService.discoverMoviesFromMongo(queryString);
   }
 }

@@ -1,4 +1,4 @@
-import { Schema, Document, Types } from 'mongoose';
+import { Schema, Document } from 'mongoose';
 import mongoose from 'mongoose';
 
 export interface IGenre {

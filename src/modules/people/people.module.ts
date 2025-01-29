@@ -6,10 +6,10 @@ import { PeopleService } from './people.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import Rating from '../movies/entities/rating.entity';
 @Module({
-    imports: [ 
-        MongooseModule.forFeature([ { name: "people", schema: PeopleSchema }]),
-        TypeOrmModule.forFeature([ Rating ]),
-      ],
+  imports: [
+    MongooseModule.forFeature([{ name: 'people', schema: PeopleSchema }]),
+    TypeOrmModule.forFeature([Rating]),
+  ],
   controllers: [PeopleController],
   providers: [PeopleService],
 })

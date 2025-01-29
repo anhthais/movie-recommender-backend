@@ -1,26 +1,21 @@
-import { Module } from "@nestjs/common";
-import { MongooseModule } from "@nestjs/mongoose";
-import { TypeOrmModule } from "@nestjs/typeorm";
-import { MovieController } from "./movie.controller";
-import MovieService from "./movie.service";
+import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { MovieController } from './movie.controller';
+import MovieService from './movie.service';
 
-// TypeORM Entities
-import LikedMovie from "./entities/liked-movie.entity";
-import WatchLater from "./entities/watch-later.entity";
-import Rating from "./entities/rating.entity";
-import Review from "./entities/review.entity";
+import LikedMovie from './entities/liked-movie.entity';
+import WatchLater from './entities/watch-later.entity';
+import Rating from './entities/rating.entity';
+import Review from './entities/review.entity';
+import { Movie } from './entities/movie.entity';
 
-// Mongoose Schema
-import { TmdbModule } from "../tmdb/tmdb.module";
-import { Movie} from "./entities/movie.entity";
-import { MovieSchema } from "./schemas/movie.schema";
-import { PeopleSchema} from "./schemas/people.schema";
+import { TmdbModule } from '../tmdb/tmdb.module';
+
 @Module({
-  imports: [ 
-    MongooseModule.forFeature([{ name: "movies", schema: MovieSchema }]),
-    TypeOrmModule.forFeature([LikedMovie, WatchLater, Rating, Review, Movie ]),
-    TmdbModule
-  ], 
+  imports: [
+    TypeOrmModule.forFeature([LikedMovie, WatchLater, Rating, Review, Movie]),
+    TmdbModule,
+  ],
   controllers: [MovieController],
   providers: [MovieService],
 })

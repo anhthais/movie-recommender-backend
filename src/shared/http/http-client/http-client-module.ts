@@ -1,9 +1,9 @@
-import { Global, Module } from "@nestjs/common";
-import { HttpClient } from "./http-client";
+import { Global, Module } from '@nestjs/common';
+import { HttpClient } from './http-client';
 
 @Global()
 @Module({
-    providers: [HttpClient],
-    exports: [HttpClient]
+  providers: [HttpClient],
+  exports: [HttpClient],
 })
-export class HttpClientModule {};
+export class HttpClientModule {}

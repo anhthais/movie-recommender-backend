@@ -1,4 +1,4 @@
-import { Entity, PrimaryColumn, Column , OneToMany} from 'typeorm';
+import { Entity, PrimaryColumn, Column, OneToMany } from 'typeorm';
 import { Movies_Casts_Combined } from './movie-cast-combined.entity';
 @Entity('movie')
 export class Movie {
@@ -48,10 +48,10 @@ export class Movie {
   poster_path: string;
 
   @Column('int', { array: true, nullable: true })
-  genre_ids: number[]; 
+  genre_ids: number[];
 
   @Column('varchar', { array: true, nullable: true })
-  trailers: string[]; 
+  trailers: string[];
 
   @Column('text', { nullable: true })
   overview: string;

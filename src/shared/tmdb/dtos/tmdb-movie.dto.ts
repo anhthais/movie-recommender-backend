@@ -1,43 +1,43 @@
-import { Expose } from "class-transformer";
+import { Expose } from 'class-transformer';
 
 export class TmdbMovieDto {
-    adult: boolean;
+  adult: boolean;
 
-    @Expose({name: 'backdrop_path'})
-    backdropPath: string;
+  @Expose({ name: 'backdrop_path' })
+  backdropPath: string;
 
-    id: number;
+  id: number;
 
-    title: string;
+  title: string;
 
-    @Expose({name: 'original_language'})
-    originalLanguage: string;
+  @Expose({ name: 'original_language' })
+  originalLanguage: string;
 
-    @Expose({name: 'original_title'})
-    originalTitle: string;
+  @Expose({ name: 'original_title' })
+  originalTitle: string;
 
-    @Expose({name: 'overview'})
-    overview: string;
+  @Expose({ name: 'overview' })
+  overview: string;
 
-    @Expose({name: 'poster_path'})
-    posterPath: string;
+  @Expose({ name: 'poster_path' })
+  posterPath: string;
 
-    @Expose({name: 'media_type'})
-    mediaType: string;
+  @Expose({ name: 'media_type' })
+  mediaType: string;
 
-    @Expose({name: 'genre_ids'})
-    genreIds: number[];
+  @Expose({ name: 'genre_ids' })
+  genreIds: number[];
 
-    popularity: number;
+  popularity: number;
 
-    @Expose({name: 'release_date'})
-    releaseDate: string;
+  @Expose({ name: 'release_date' })
+  releaseDate: string;
 
-    video: boolean;
+  video: boolean;
 
-    @Expose({name: 'vote_average'})
-    voteAverage: number;
-    
-    @Expose({name: 'vote_count'})
-    voteCount: number;
+  @Expose({ name: 'vote_average' })
+  voteAverage: number;
+
+  @Expose({ name: 'vote_count' })
+  voteCount: number;
 }

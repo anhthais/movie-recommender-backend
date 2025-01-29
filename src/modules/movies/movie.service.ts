@@ -1,27 +1,25 @@
-import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
-import { InjectRepository } from "@nestjs/typeorm";
-import LikedMovie from "./entities/liked-movie.entity";
-import { In, Repository } from "typeorm";
-import { PaginationConfig, SortDirection } from "@/shared/constants/pagination";
-import PaginationResponse from "@/shared/types/pagination-response";
-import TmdbService from "../tmdb/tmdb.service";
-import WatchLater from "./entities/watch-later.entity";
-import Rating from "./entities/rating.entity";
-import Review from "./entities/review.entity";
-import { plainToInstance } from "class-transformer";
-import { UserMiniDto } from "../user/dto/user-mini.dto";
-import { Model } from "mongoose";
-import { InjectModel } from "@nestjs/mongoose";
-import { Movie } from "./entities/movie.entity";
-import { IMovie } from "./schemas/movie.schema";
-import { FilterParams } from "@/shared/tmdb/types/movie.type";
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import LikedMovie from './entities/liked-movie.entity';
+import { Repository } from 'typeorm';
+import { SortDirection } from '@/shared/constants/pagination.constant';
+import TmdbService from '../tmdb/tmdb.service';
+import WatchLater from './entities/watch-later.entity';
+import Rating from './entities/rating.entity';
+import Review from './entities/review.entity';
+import { plainToInstance } from 'class-transformer';
+import { UserMiniDto } from '../user/dto/user-mini.dto';
+import { Movie } from './entities/movie.entity';
 export interface MovieQueryOptions {
-    page?: number;
-    limit?: number;
-    keywords?: string;
-    sortBy?: string;
-
-};
+  page?: number;
+  limit?: number;
+  keywords?: string;
+  sortBy?: string;
+}
 
 @Injectable()
 export default class MovieService {
@@ -31,11 +29,12 @@ export default class MovieService {
     private readonly likedMovieRepo: Repository<LikedMovie>,
     @InjectRepository(WatchLater)
     private readonly watchLaterRepo: Repository<WatchLater>,
-    @InjectRepository(Rating) private readonly ratingRepo: Repository<Rating>,
-    @InjectRepository(Review) private readonly reviewRepo: Repository<Review>,
-    @InjectRepository(Movie) private readonly movieRepo: Repository<Movie>,
-
-    @InjectModel('movies') private readonly movieModel: Model<IMovie>,
+    @InjectRepository(Rating)
+    private readonly ratingRepo: Repository<Rating>,
+    @InjectRepository(Review)
+    private readonly reviewRepo: Repository<Review>,
+    @InjectRepository(Movie)
+    private readonly movieRepo: Repository<Movie>,
   ) {}
 
   // async findLikedMoviesByUserId(userId: number, options?: MovieQueryOptions): Promise<PaginationResponse> {
@@ -65,7 +64,6 @@ export default class MovieService {
   // }
 
   async findLikedMoviesByUserId(userId: number) {
-    console.log('Check' + userId);
     const likedMovieIds = await this.likedMovieRepo.findAndCount({
       where: {
         user: { id: userId },
@@ -74,7 +72,6 @@ export default class MovieService {
         createdAt: SortDirection.DESC,
       },
     });
-    console.log(likedMovieIds);
     const data = likedMovieIds[0].map((movie) => movie.movieId);
 
     return data;
@@ -96,7 +93,7 @@ export default class MovieService {
       throw new BadRequestException('Liked this movie before');
     }
 
-    const savedData = await this.likedMovieRepo.save({
+    await this.likedMovieRepo.save({
       user: {
         id: userId,
       },
@@ -146,7 +143,7 @@ export default class MovieService {
       throw new BadRequestException('Added this movie before');
     }
 
-    const savedData = await this.watchLaterRepo.save({
+    await this.watchLaterRepo.save({
       user: {
         id: userId,
       },
@@ -373,34 +370,6 @@ export default class MovieService {
     return reviewId;
   }
 
-  async getMoviesWithObjectIds(objectIds: string[]) {
-    const movies = await this.movieModel.find({ _id: { $in: objectIds } });
-
-    return movies.map((movie) => ({
-      id: movie.id,
-      tmdb_id: movie.tmdb_id,
-      backdrop_path: movie.backdrop_path,
-      title: movie.title,
-      original_title: movie.original_title,
-      original_language: movie.original_language,
-      tagline: movie.tagline,
-      release_date: movie.release_date,
-      budget: movie.budget,
-      revenue: movie.revenue,
-      runtime: movie.runtime,
-      popularity: movie.popularity,
-      video: movie.video,
-      status: movie.status,
-      poster_path: movie.poster_path,
-      genre_ids: movie.genres.map((genre) => genre.id),
-      genres: movie.genres.map((genre) => ({
-        id: genre.id,
-        name: genre.name,
-      })),
-      overview: movie.overview,
-    }));
-  }
-
   async getMovieById(movieId: number) {
     const movie = await this.tmdbService.getFullMovieById(movieId);
     const ratings = await this.ratingRepo.find({ where: { movieId: movieId } });
@@ -559,79 +528,4 @@ export default class MovieService {
   async getMovieCasts(movieId: number) {
     return this.tmdbService.getMovieCasts(movieId);
   }
-
-  // MongoDB version
-  async getMovieByIdFromMongo(movieId: number): Promise<IMovie | null> {
-    return this.movieModel.findOne({ tmdb_id: movieId }).exec();
-  }
-
-  async searchMoviesFromMongo(
-    query: string,
-    page: number,
-  ): Promise<{ results: IMovie[]; total: number }> {
-    const limit = 20;
-    const skip = (page - 1) * limit;
-
-    const [results, total] = await Promise.all([
-      this.movieModel
-        .find({ title: { $regex: query, $options: 'i' } })
-        .skip(skip)
-        .limit(limit)
-        .exec(),
-      this.movieModel.countDocuments({
-        title: { $regex: query, $options: 'i' },
-      }),
-    ]);
-
-    return { results, total };
-  }
-
-  async getPopularMoviesFromMongo(): Promise<IMovie[]> {
-    return this.movieModel.find().sort({ popularity: -1 }).limit(20).exec();
-  }
-
-  async getTrendingMoviesFromMongo(
-    mediaType: string,
-    duration: string,
-  ): Promise<IMovie[]> {
-    const filter = { media_type: mediaType, trending_duration: duration };
-    return this.movieModel
-      .find(filter)
-      .sort({ popularity: -1 })
-      .limit(20)
-      .exec();
-  }
-
-  async getNowPlayingMoviesFromMongo(): Promise<IMovie[]> {
-    const today = new Date();
-    return this.movieModel
-      .find({ release_date: { $lte: today.toISOString() }, status: 'Released' })
-      .sort({ release_date: -1 })
-      .limit(20)
-      .exec();
-  }
-
-  async discoverMoviesFromMongo(queryString: string): Promise<IMovie[]> {
-    const filter: Record<string, any> = {};
-    const params = new URLSearchParams(queryString);
-
-    params.forEach((value, key) => {
-      if (
-        key === 'vote_average.gte' ||
-        key === 'vote_average.lte' ||
-        key === 'popularity.gte'
-      ) {
-        filter[key.split('.')[0]] = {
-          ...filter[key.split('.')[0]],
-          [key.split('.')[1]]: Number(value),
-        };
-      } else if (key === 'with_genres') {
-        filter['genres.id'] = { $in: value.split(',').map((id) => Number(id)) };
-      } else {
-        filter[key] = value;
-      }
-    });
-
-    return this.movieModel.find(filter).exec();
-  }
-};
+}

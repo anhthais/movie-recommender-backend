@@ -1,4 +1,4 @@
-import { Schema, Document, Types } from 'mongoose';
+import { Schema, Document } from 'mongoose';
 import mongoose from 'mongoose';
 
 export interface IGenre {
@@ -132,4 +132,7 @@ export const MoviePopularSchema = new Schema<IMoviePopular>(
   { collection: 'movies' },
 );
 
-export const MovieModel = mongoose.model<IMoviePopular>('MoviePopular', MoviePopularSchema);
+export const MovieModel = mongoose.model<IMoviePopular>(
+  'MoviePopular',
+  MoviePopularSchema,
+);
