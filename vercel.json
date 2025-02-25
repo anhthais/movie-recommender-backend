@@ -2,17 +2,18 @@
   "version": 2,
   "builds": [
     {
-      "src": "dist/main.ts",
+      "src": "src/main.ts",
       "use": "@vercel/node",
       "config": {
-        "buildCommand": "npm run build"
+        "buildCommand": "npm run build",
+        "includeFiles": ["dist/**"]
       }
     }
   ],
   "routes": [
     {
       "src": "/(.*)",
-      "dest": "/dist/main.js"
+      "dest": "src/main.ts"
     }
   ],
   "git": {
